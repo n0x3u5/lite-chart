@@ -1,0 +1,29 @@
+{
+  "name": "d3-sandbox",
+  "version": "0.0.1",
+  "description": "Playing with D3",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:prod": "rm -rf dist/ && webpack -p",
+    "build:dev": "rm -rf dist/ && webpack",
+    "watch": "webpack --watch"
+  },
+  "keywords": [
+    "d3",
+    "javascript",
+    "data",
+    "visualization"
+  ],
+  "author": "Nakshatra Mukhopadhyay",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "d3": "^4.10.2",
+    "ramda": "^0.24.1",
+    "rimraf": "^2.6.2",
+    "webpack": "^3.5.6"
+  }
+}

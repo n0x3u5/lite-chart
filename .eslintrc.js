@@ -2,7 +2,7 @@ module.exports = {
   "extends": "airbnb-base",
   "rules": {
     "comma-dangle": "off",
-    "one-var": ["error", "always"],
+    "one-var": "off",
     "indent": ["error", 2, {
       "SwitchCase": 1,
       "VariableDeclarator": {
@@ -11,6 +11,7 @@ module.exports = {
         "const": 3
       }
     }],
-    "no-restricted-properties": "warn"
+    "no-restricted-properties": "warn",
+    "space-before-function-paren": ["error", "always"]
   }
 };

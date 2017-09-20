@@ -18,7 +18,8 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HTMLWebpackPlugin({
-      title: 'LiteChart'
+      title: 'LiteChart',
+      template: 'template/index.html'
     })
   ],
   output: {

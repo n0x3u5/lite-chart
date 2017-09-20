@@ -1,21 +1,44 @@
-import scaleOrdinal from 'd3-scale/src/ordinal';
-import zipObj from 'ramda/src/zipObj';
+import SVG from 'svg.js';
+
+import Axis from './axes/axis';
+import ScaleOrdinal from './scales/ordinal';
 
 const tenPow = num => num ** 10,
-      toPrecision = (num, precision) => Math.round(num * tenPow(precision)) / tenPow(precision),
-      range = ['A', 'B', 'C', 'D', 'E', 'F'],
-      rangePadding = 0.5,
-      domainStart = 29,
-      domainEnd = 625,
-      precision = 2,
-      domainSpan = Math.abs(domainEnd - domainStart),
-      domainInterval = domainSpan / (range.length - 1),
-      paddedDomainStart = domainStart + (domainInterval * rangePadding),
-      // paddedDomainEnd = domainEnd - (domainInterval * rangePadding),
-      getDomain = (v, i) => toPrecision(paddedDomainStart + (i * domainInterval), precision),
-      domain = range.map(getDomain),
-      ordinalScale = scaleOrdinal()
-        .range(range)
-        .domain(domain);
+      toPrecision = (num, precision = 2) => Math.round(num * tenPow(precision)) / tenPow(precision),
+      width = '100%',
+      height = '100%',
+      yRange = ['A', 'B', 'C', 'D', 'E', 'F'],
+      xRange = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
+      // Prepping Y Axis scale for consumption by axis
+      yDomainStart = 20,
+      yDomainEnd = 105,
+      yDomainSpan = Math.abs(yDomainEnd - yDomainStart),
+      yDomainInterval = yDomainSpan / (yRange.length - 1),
+      getYDomain = (v, i) => toPrecision(yDomainStart + (i * yDomainInterval)),
+      yDomain = yRange.map(getYDomain),
+      yOrdinalScale = new ScaleOrdinal()
+        .setRange(yRange)
+        .setDomain(yDomain),
+      ordinalYAxis = new Axis(),
+      // Prepping X Axis scale for consumption by axis
+      xDomainStart = 75,
+      xDomainEnd = 600,
+      xDomainSpan = Math.abs(xDomainEnd - xDomainStart),
+      xDomainInterval = xDomainSpan / (xRange.length - 1),
+      getXDomain = (v, i) => toPrecision(xDomainStart + (i * xDomainInterval)),
+      xDomain = xRange.map(getXDomain),
+      xOrdinalScale = new ScaleOrdinal()
+        .setRange(xRange)
+        .setDomain(xDomain),
+      ordinalXAxis = new Axis(),
+      painter = SVG('container').size(width, height);
 
-console.log(zipObj(ordinalScale.range(), ordinalScale.domain()));
+ordinalYAxis.setOrientation('left');
+ordinalYAxis.setScale(yOrdinalScale);
+ordinalYAxis.setPainter(painter);
+ordinalYAxis.draw();
+
+ordinalXAxis.setValuePadding(0.5);
+ordinalXAxis.setScale(xOrdinalScale);
+ordinalXAxis.setPainter(painter);
+ordinalXAxis.draw();

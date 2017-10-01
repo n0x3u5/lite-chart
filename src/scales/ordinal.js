@@ -1,11 +1,14 @@
+const DEFAULT_UNKNOWN = 'implicit';
+
 class ScaleOrdinal {
   constructor () {
     this.config = {
       map: new Map()
     };
 
-    this.setDomain();
-    this.setRange();
+    this.config.unknown = DEFAULT_UNKNOWN;
+    this.config.domain = [];
+    this.config.ordinalRange = [];
   }
 
   setDomain (domain = []) {
@@ -22,8 +25,7 @@ class ScaleOrdinal {
       key = domainElement.toString();
 
       if (!this.config.map.has(key)) {
-        this.config.map.set(key, domainElement);
-        this.config.domain.push(domainElement);
+        this.config.map.set(key, this.config.domain.push(domainElement));
       }
 
       idx += 1;
@@ -32,36 +34,49 @@ class ScaleOrdinal {
     return this;
   }
   getDomain () {
-    return this.config.domain;
+    return this.config.domain.slice();
   }
 
   setRange (range = []) {
-    this.config.range = range.slice();
+    this.config.ordinalRange = range.slice();
 
     return this;
   }
   getRange () {
-    return this.config.range;
+    return this.config.ordinalRange.slice();
+  }
+
+  setUnknown (unknown) {
+    this.config.unknown = unknown;
+
+    return this;
+  }
+  getUnknown () {
+    return this.config.unknown;
   }
 
   getRangeForDomain (domainElement) {
     const key = domainElement.toString(),
-          { domain } = this.config;
+          { map } = this.config;
 
-    let val;
+    let val = map.get(key);
 
-    if (this.config.map.has(key)) {
-      val = this.config.map.get(key);
-    } else {
-      val = domain.push(domainElement);
-      this.config.map.set(key, val);
+    if (!val) {
+      if (this.getUnknown() !== DEFAULT_UNKNOWN) {
+        return this.getUnknown();
+      }
+      val = this.config.domain.push(domainElement);
+      map.set(key, val);
     }
 
-    return this.config.range[(val - 1) % this.config.range.length];
+    return this.config.ordinalRange[(val - 1) % this.config.ordinalRange.length];
   }
 
-  getDomainForRange (rangeElement) {
-    return this.config.domain[this.config.range.findIndex(rangeElement)];
+  copy () {
+    return new ScaleOrdinal()
+      .setDomain(this.config.domain)
+      .setRange(this.config.ordinalRange)
+      .setUnknown(this.config.unknown);
   }
 }
 

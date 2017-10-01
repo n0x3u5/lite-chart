@@ -7,7 +7,6 @@ class Axis {
     };
     this.store = {};
 
-    this.setValuePadding();
     this.setOrientation();
   }
 
@@ -18,15 +17,6 @@ class Axis {
   }
   getOrientation () {
     return this.orientation;
-  }
-
-  setValuePadding (valuePadding = 0) {
-    this.config.valuePadding = valuePadding;
-
-    return this;
-  }
-  getValuePadding () {
-    return this.config.valuePadding;
   }
 
   setScale (scale) {
@@ -55,48 +45,7 @@ class Axis {
       return;
     }
 
-    const domain = scale.getDomain(),
-          orientation = this.getOrientation(),
-          valuePadding = this.getValuePadding(),
-          domainInterval = Math.abs(domain[0] - domain[1]),
-          domainStart = domain[0] - (domainInterval * valuePadding),
-          domainEnd = domain[domain.length - 1] + (domainInterval * valuePadding),
-          { graphics } = this,
-          painterBox = painter.viewbox(),
-          painterStartX = painterBox.x,
-          painterEndY = painterBox.height - painterBox.y;
-
-    if (orientation === 'bottom') {
-      graphics.line = painter.line().plot(
-        domainStart,
-        painterEndY - 50,
-        domainEnd,
-        painterEndY - 50
-      ).attr({
-        stroke: '#000000'
-      });
-
-      graphics.ticks = domain.map(element => painter.circle().radius(2).attr({
-        fill: '#000',
-        cx: element,
-        cy: painterEndY - 50
-      }));
-    } else if (orientation === 'left') {
-      graphics.line = painter.line().plot(
-        painterStartX + 50,
-        domainStart,
-        painterStartX + 50,
-        domainEnd
-      ).attr({
-        stroke: '#000000'
-      });
-
-      graphics.ticks = domain.map(element => painter.circle().radius(2).attr({
-        fill: '#000',
-        cx: painterStartX + 50,
-        cy: element
-      }));
-    }
+    console.log('ya');
   }
 }
 

@@ -1,5 +1,10 @@
 module.exports = {
   "extends": "airbnb-base",
+  "env": {
+    "jest": true,
+    "browser": true,
+    "node": true
+  },
   "rules": {
     "comma-dangle": "off",
     "one-var": "off",

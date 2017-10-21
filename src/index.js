@@ -18,10 +18,6 @@ const y = 300,
       bandWidth = xBandScale.getBandwidth(),
       halfBandwidth = bandWidth / 2;
 
-painter.line(xRangeStart, y, xRangeEnd, y).attr({
-  'stroke-width': 1
-});
-
 xDomain.map((el) => {
   const bandHeight = (Math.random() * (maxBandHeight - minBandHeight)) + minBandHeight;
 
@@ -48,3 +44,7 @@ xDomain.map(el =>
     y,
     'font-size': '12px'
   }));
+
+painter.line(xRangeStart, y, xRangeEnd, y).attr({
+  'stroke-width': 1
+});

@@ -1,7 +1,3 @@
-function constant (x) {
-  return function () {
-    return x;
-  };
-}
+const constant = x => () => x;
 
 export default constant;

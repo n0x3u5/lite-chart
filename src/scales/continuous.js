@@ -120,7 +120,7 @@ class ScaleContinuous {
     this.input = null;
     this.output = null;
 
-    return this.rescale();
+    this.rescale();
   }
 
   rescale () {
@@ -168,13 +168,17 @@ class ScaleContinuous {
 
   setClamp (willClamp = false) {
     this.willClamp = Boolean(willClamp);
+
+    return this.rescale();
   }
   getClamp () {
     return this.willClamp;
   }
 
   getRangeForDomain (domainElement) {
-    const deinterpolate = this.clamp ? deinterpolateClamp(this.deinterpolate) : this.deinterpolate;
+    const deinterpolate = this.willClamp
+      ? deinterpolateClamp(this.deinterpolate)
+      : this.deinterpolate;
 
     if (!this.output) {
       this.output = this.piecewise(this.domain, this.range, deinterpolate, this.interpolate);
@@ -183,7 +187,9 @@ class ScaleContinuous {
     return this.output(Number(domainElement));
   }
   getDomainForRange (rangeElement) {
-    const reinterpolate = this.clamp ? reinterpolateClamp(this.reinterpolate) : this.reinterpolate;
+    const reinterpolate = this.willClamp
+      ? reinterpolateClamp(this.reinterpolate)
+      : this.reinterpolate;
 
     if (!this.input) {
       this.input = this.piecewise(this.range, this.domain, deinterpolateLinear, reinterpolate);

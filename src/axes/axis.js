@@ -42,10 +42,10 @@ class Axis {
           scale = this.getScale();
 
     if (!painter || !scale) {
-      return;
+      return this;
     }
 
-    console.log('ya');
+    return this;
   }
 }
 

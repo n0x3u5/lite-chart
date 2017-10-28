@@ -17,6 +17,10 @@ module.exports = {
       }
     }],
     "no-restricted-properties": "warn",
+    "prefer-destructuring": ["error", {
+      "array": false,
+      "object": true
+    }],
     "space-before-function-paren": ["error", "always"]
   }
 };

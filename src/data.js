@@ -1,56 +1,58 @@
 const domain = [
   {
     x: 'Jan',
-    color: '#A7CEE2'
+    color: '#267278'
   },
   {
     x: 'Feb',
-    color: '#2679B2'
+    color: '#65338D'
   },
   {
     x: 'Mar',
-    color: '#B3DE8E'
+    color: '#4770B3'
   },
   {
     x: 'Apr',
-    color: '#389F34'
+    color: '#D21F57'
   },
   {
     x: 'May',
-    color: '#F99B9B'
+    color: '#3B3689'
   },
   {
     x: 'Jun',
-    color: '#E01F27'
+    color: '#50AED3'
   },
   {
     x: 'Jul',
-    color: '#FCBE75'
+    y: 0,
+    color: '#4BB24F'
   },
   {
     x: 'Aug',
-    color: '#FD7F23'
+    color: '#E57438'
   },
   {
     x: 'Sep',
-    color: '#CAB3D5'
+    color: '#569DD2'
   },
   {
     x: 'Oct',
-    color: '#694098'
+    y: 900,
+    color: '#569D79'
   },
   {
     x: 'Nov',
-    color: '#FFFE9F'
+    color: '#58595B'
   },
   {
     x: 'Dec',
-    color: '#AF592F'
+    color: '#E4B031'
   }
 ];
 
 export default domain.map(domainElem => ({
   x: domainElem.x,
-  y: Math.random() * -20,
+  y: domainElem.y === undefined ? Math.random() * 900 : domainElem.y,
   color: domainElem.color
 }));

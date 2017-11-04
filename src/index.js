@@ -1,217 +1,108 @@
-import SmartLabel from 'fusioncharts-smartlabel';
+import SVG from 'svg.js';
+import data from './data';
 import ScaleBand from './scales/band';
 import ScaleLinear from './scales/linear';
-import data from './data';
+import ScalePoint from './scales/point';
+import { AxisLeft, AxisBottom } from './axes/axis';
 
-const SVG_NS = 'http://www.w3.org/2000/svg',
-      top = 10,
-      left = 60,
-      height = 290,
-      width = 680,
-      bottom = top + height,
-      right = left + width,
-      tickLength = 5,
-      fontSize = 12,
-      minBandHeight = 1,
-      sl = new SmartLabel('lc-sl').setStyle({
-        'font-size': '12px',
-        'font-family': 'Helvetica, Arial, sans-serif',
-        'font-weight': 'normal',
-        'font-style': 'normal'
-      }),
-      xBandScale = new ScaleBand()
+const margin = {
+        top: 30,
+        right: 20,
+        bottom: 20,
+        left: 30
+      },
+      svgWidth = 960,
+      svgHeight = 500,
+      width = svgWidth - margin.left - margin.right,
+      height = svgHeight - margin.top - margin.bottom,
+      painter = SVG('container').size(svgWidth, svgHeight)
+        .group()
+        .attr('transform', `translate(${margin.left}, ${margin.top})`)
+        .addClass('chart'),
+      bandScale = new ScaleBand()
         .setDomain(data.map(datum => datum.x))
-        .setRange([left, right])
+        .setRange([0, width])
         .setPadding(0.25),
-      yRange = [minBandHeight, height],
-      yLinearScale = new ScaleLinear()
+      pointScale = new ScalePoint()
+        .setDomain(data.map(datum => datum.x))
+        .setRange([0 + (bandScale.getBandwidth() / 2), width - (bandScale.getBandwidth() / 2)])
+        .setPadding(0.25),
+      linearScale = new ScaleLinear()
         .setDomain([
           Math.min(0, data.map(datum => datum.y).reduce((a, b) => Math.min(a, b))),
-          data.map(datum => datum.y).reduce((a, b) => Math.max(a, b)) + 1
+          data.map(datum => datum.y).reduce((a, b) => Math.max(a, b))
         ])
-        .setRange(yRange)
+        .setRange([height, 0])
         .nice(),
-      ticks = yLinearScale.ticks().map((tick) => {
-        const ob = sl.getOriSize(tick.toString());
-        ob.text = tick;
-        return ob;
-      }),
-      tickIncrement = yLinearScale.getRangeForDomain(ticks[1].text) -
-        yLinearScale.getRangeForDomain(ticks[0].text),
-      svg = document.createElementNS(SVG_NS, 'svg'),
-      bandWidth = xBandScale.getBandwidth(),
-      halfBandwidth = bandWidth / 2;
+      hAxis = new AxisBottom(bandScale),
+      vAxis = new AxisLeft(linearScale)
+        .setTickSizeOuter(0);
 
-svg.setAttribute('width', 800);
-svg.setAttribute('height', 400);
+painter.path()
+  .addClass('area-plot')
+  .attr({
+    stroke: '#000000',
+    'stroke-width': 4,
+    'stroke-linejoin': 'round',
+    'fill-opacity': 0.8,
+    fill: '#F5C8AF'
+  })
+  .plot(data.reduce((acc, datum, idx, arr) => {
+    const path = `${acc} ${pointScale.getRangeForDomain(datum.x)} ${linearScale.getRangeForDomain(datum.y)}`;
 
-ticks.map((tick) => {
-  const tickElem = document.createElementNS(SVG_NS, 'line'),
-        yPos = bottom - yLinearScale.getRangeForDomain(tick.text),
-        fill = '#000000';
-
-  tickElem.setAttribute('x1', left - tickLength);
-  tickElem.setAttribute('y1', yPos);
-  tickElem.setAttribute('x2', right);
-  tickElem.setAttribute('y2', yPos);
-  tickElem.setAttribute('stroke', fill);
-  tickElem.setAttribute('opacity', tick.text === 0 ? 1 : 0.2);
-
-  svg.appendChild(tickElem);
-
-  return tickElem;
-});
-
-ticks.map((tick, i) => {
-  const tickElem = document.createElementNS(SVG_NS, 'rect'),
-        yPos = bottom - yLinearScale.getRangeForDomain(tick.text),
-        fill = '#000000';
-
-  if (yLinearScale.getDomainForRange(0) < yLinearScale.getDomainForRange(1)) {
-    if (i % 2 !== 0) {
-      tickElem.setAttribute('x', left);
-      tickElem.setAttribute('y', yPos);
-      tickElem.setAttribute('width', right - left);
-      tickElem.setAttribute('height', Math.abs(tickIncrement));
-      tickElem.setAttribute('stroke', fill);
-      tickElem.setAttribute('opacity', 0.1);
-
-      svg.appendChild(tickElem);
+    if (idx === arr.length - 1) {
+      return `${path} L ${pointScale.getRangeForDomain(datum.x)} ${linearScale.getRangeForDomain(linearScale.getDomain()[0])}`;
     }
-  } else if (i % 2 === 0) {
-    tickElem.setAttribute('x', left);
-    tickElem.setAttribute('y', yPos);
-    tickElem.setAttribute('width', right - left);
-    tickElem.setAttribute('height', Math.abs(tickIncrement));
-    tickElem.setAttribute('stroke', fill);
-    tickElem.setAttribute('opacity', 0.1);
 
-    svg.appendChild(tickElem);
-  }
+    return `${path} L`;
+  }, `M ${pointScale.getRangeForDomain(data[0].x)} ${linearScale.getRangeForDomain(linearScale.getDomain()[0])}`));
 
-  return tickElem;
-});
+data.map(datum =>
+  painter.rect()
+    .addClass('bar-plot')
+    .attr({
+      x: bandScale.getRangeForDomain(datum.x),
+      y: linearScale.getRangeForDomain(datum.y),
+      width: bandScale.getBandwidth(),
+      height: height - linearScale.getRangeForDomain(datum.y),
+      fill: datum.color
+    })
+    .style('shape-rendering', 'crisp-edges'));
 
-data.map((datum) => {
-  const domainMin = yLinearScale.getDomain()[0],
-        plotHeight = yLinearScale.getRangeForDomain(datum.y) -
-          yLinearScale.getRangeForDomain(domainMin),
-        plotWidth = bandWidth < 1 ? 1 : bandWidth,
-        isReverse = yLinearScale.getDomainForRange(0) > yLinearScale.getDomainForRange(1),
-        xPos = xBandScale.getRangeForDomain(datum.x),
-        yPos = datum.y < domainMin
-          ? bottom - yLinearScale.getRangeForDomain(isReverse ? datum.y : domainMin)
-          : bottom - yLinearScale.getRangeForDomain(isReverse ? domainMin : datum.y),
-        fill = datum.color,
-        band = document.createElementNS(SVG_NS, 'rect');
+painter.path()
+  .addClass('line-plot')
+  .attr({
+    stroke: '#000000',
+    'stroke-width': 4,
+    'stroke-linejoin': 'round',
+    'stroke-linecap': 'round',
+    fill: 'none'
+  })
+  .plot(data.reduce((acc, datum, idx, arr) => {
+    const path = `${acc} ${pointScale.getRangeForDomain(datum.x)} ${linearScale.getRangeForDomain(datum.y)}`;
 
-  band.setAttribute('x', xPos);
-  band.setAttribute('y', yPos);
-  band.setAttribute('width', plotWidth);
-  band.setAttribute('height', Math.abs(plotHeight));
-  band.setAttribute('fill', fill);
+    if (idx === 0) {
+      return `M ${path}`;
+    }
 
-  svg.appendChild(band);
+    if (idx === arr.length - 1) {
+      return `${path}`;
+    }
 
-  return band;
-});
+    return `${path} L`;
+  }, ''));
 
-data.map((datum) => {
-  const xPos = xBandScale.getRangeForDomain(datum.x) + halfBandwidth,
-        tickElem = document.createElementNS(SVG_NS, 'line');
+data.map(datum =>
+  painter.circle().addClass('circle-plot').attr({
+    cx: pointScale.getRangeForDomain(datum.x),
+    cy: linearScale.getRangeForDomain(datum.y),
+    r: 4,
+    fill: '#ffffff',
+    'stroke-width': 2,
+    stroke: datum.color
+  }));
 
-  tickElem.setAttribute('x1', xPos);
-  tickElem.setAttribute('y1', bottom);
-  tickElem.setAttribute('x2', xPos);
-  tickElem.setAttribute('y2', bottom + tickLength);
-  tickElem.setAttribute('stroke', '#000000');
+hAxis.draw(painter);
+vAxis.draw(painter);
 
-  svg.appendChild(tickElem);
-
-  return tickElem;
-});
-
-data.map((datum) => {
-  const labelElem = document.createElementNS(SVG_NS, 'text'),
-        text = datum.x.split('#FC')[0],
-        textDimensions = sl.getOriSize(text),
-        xPos = (xBandScale.getRangeForDomain(datum.x) + halfBandwidth),
-        yPos = bottom + textDimensions.height;
-
-  labelElem.setAttribute('x', xPos);
-  labelElem.setAttribute('y', yPos);
-  labelElem.setAttribute('dominant-baseline', 'central');
-  labelElem.setAttribute('text-anchor', 'middle');
-  labelElem.setAttribute('transform', `rotate(0,${xPos},${yPos})`);
-  labelElem.setAttribute('font-size', `${fontSize}px`);
-  labelElem.setAttribute('font-family', 'Helvetica, Arial, sans-serif');
-  labelElem.innerHTML = text;
-
-  svg.appendChild(labelElem);
-
-  return labelElem;
-});
-
-ticks.map((tick) => {
-  const labelElem = document.createElementNS(SVG_NS, 'text'),
-        xPos = left - tick.width - tickLength - 2,
-        yPos = bottom - yLinearScale.getRangeForDomain(tick.text);
-
-  labelElem.setAttribute('x', xPos);
-  labelElem.setAttribute('y', yPos);
-  labelElem.setAttribute('dominant-baseline', 'central');
-  labelElem.setAttribute('text-anchor', 'right');
-  labelElem.setAttribute('font-size', `${fontSize}px`);
-  labelElem.setAttribute('font-family', 'Helvetica, Arial, sans-serif');
-  labelElem.innerHTML = tick.text.toString();
-
-  svg.appendChild(labelElem);
-
-  return labelElem;
-});
-
-const trendLine = document.createElementNS(SVG_NS, 'line'),
-      trendY = yLinearScale.getRangeForDomain(7);
-
-trendLine.setAttribute('x1', left);
-trendLine.setAttribute('y1', bottom - trendY);
-trendLine.setAttribute('x2', right);
-trendLine.setAttribute('y2', bottom - trendY);
-trendLine.setAttribute('stroke', '#30ef00');
-
-svg.appendChild(trendLine);
-
-const trendLabel = document.createElementNS(SVG_NS, 'text');
-
-trendLabel.setAttribute('x', right + 2);
-trendLabel.setAttribute('y', bottom - trendY);
-trendLabel.setAttribute('fill', '#30ef00');
-trendLabel.setAttribute('dominant-baseline', 'central');
-trendLabel.setAttribute('text-anchor', 'right');
-trendLabel.setAttribute('font-size', `${fontSize}px`);
-trendLabel.setAttribute('font-family', 'Helvetica, Arial, sans-serif');
-trendLabel.innerHTML = 'Here be 7';
-
-svg.appendChild(trendLabel);
-
-const horizontalLine = document.createElementNS(SVG_NS, 'line');
-
-horizontalLine.setAttribute('x1', left);
-horizontalLine.setAttribute('y1', bottom - yLinearScale.getRangeForDomain(0));
-horizontalLine.setAttribute('x2', right);
-horizontalLine.setAttribute('y2', bottom - yLinearScale.getRangeForDomain(0));
-horizontalLine.setAttribute('stroke', '#000000');
-
-svg.appendChild(horizontalLine);
-
-const verticalLine = document.createElementNS(SVG_NS, 'line');
-
-verticalLine.setAttribute('x1', left);
-verticalLine.setAttribute('y1', bottom - height);
-verticalLine.setAttribute('x2', left);
-verticalLine.setAttribute('y2', bottom);
-verticalLine.setAttribute('stroke', '#000000');
-
-svg.appendChild(verticalLine);
-
-document.getElementById('container').appendChild(svg);
+hAxis.container.attr('transform', `translate(0, ${height})`);

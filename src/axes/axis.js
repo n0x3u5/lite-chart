@@ -29,6 +29,76 @@ class Axis {
     this.transform = this.orient === TOP || this.orient === BOTTOM ? translateX : translateY;
   }
 
+  setScale (scale) {
+    if (scale != null) this.scale = scale;
+
+    return this;
+  }
+  getScale () {
+    return this.scale;
+  }
+
+  ticks (...params) {
+    this.tickArguments = params.slice();
+
+    return this;
+  }
+
+  setTickArguments (tickArgs) {
+    this.tickArguments = tickArgs == null ? [] : tickArgs.slice();
+
+    return this;
+  }
+  getTickArguments () {
+    return this.tickArguments.slice();
+  }
+
+  setTickValues (tickValues) {
+    this.tickValues = tickValues == null ? null : tickValues.slice();
+
+    return this;
+  }
+  getTickValues () {
+    return this.tickValues && this.tickValues.slice();
+  }
+
+  setTickSize (size) {
+    this.tickSizeOuter = Number(size);
+    this.tickSizeInner = this.tickSizeOuter;
+
+    return this;
+  }
+  getTickSize () {
+    return this.getTickSizeInner();
+  }
+
+  setTickSizeInner (size) {
+    this.tickSizeInner = Number(size);
+
+    return this;
+  }
+  getTickSizeInner () {
+    return this.tickSizeInner;
+  }
+
+  setTickSizeOuter (size) {
+    this.tickSizeOuter = Number(size);
+
+    return this;
+  }
+  getTickSizeOuter () {
+    return this.tickSizeOuter;
+  }
+
+  setTickPadding (padding) {
+    this.tickPadding = Number(padding);
+
+    return this;
+  }
+  getTickPadding () {
+    return this.tickPadding;
+  }
+
   draw (painter) {
     if (this.tickValues == null) {
       if (this.scale.ticks) {
@@ -66,8 +136,8 @@ class Axis {
     }
 
     this.line.plot(this.orient === LEFT || this.orient === RIGHT
-      ? `M ${0} ${this.range0} V ${this.range1}`
-      : `M ${this.range0} ${0} H ${this.range1}`);
+      ? `M ${this.k * this.tickSizeOuter} ${this.range0} H 0.5 V ${this.range1} H ${this.k * this.tickSizeOuter}`
+      : `M ${this.range0} ${this.k * this.tickSizeOuter} V 0.5 H ${this.range1} V ${this.k * this.tickSizeOuter}`);
 
     this.ticks = this.values.map((value) => {
       const pos = this.position(value),
@@ -97,6 +167,8 @@ class Axis {
 
       return tickGroup;
     });
+
+    return this;
   }
 }
 
@@ -123,6 +195,5 @@ class AxisLeft extends Axis {
     super(LEFT, scale);
   }
 }
-
 
 export { AxisTop, AxisRight, AxisBottom, AxisLeft };

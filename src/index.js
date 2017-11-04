@@ -6,8 +6,8 @@ import ScalePoint from './scales/point';
 import { AxisLeft, AxisBottom } from './axes/axis';
 
 const margin = {
-        top: 20,
-        right: 10,
+        top: 30,
+        right: 20,
         bottom: 20,
         left: 30
       },
@@ -35,7 +35,8 @@ const margin = {
         .setRange([height, 0])
         .nice(),
       hAxis = new AxisBottom(bandScale),
-      vAxis = new AxisLeft(linearScale);
+      vAxis = new AxisLeft(linearScale)
+        .setTickSizeOuter(0);
 
 painter.path()
   .addClass('area-plot')

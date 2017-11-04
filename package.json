@@ -21,12 +21,12 @@
   "author": "Nakshatra Mukhopadhyay",
   "license": "MIT",
   "dependencies": {
-    "d3-scale": "^1.0.6",
     "fusioncharts-smartlabel": "^1.0.2",
     "ramda": "^0.24.1",
     "svg.js": "^2.6.3"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
@@ -38,6 +38,7 @@
     "html-webpack-plugin": "^2.30.1",
     "jest": "^21.2.0",
     "rimraf": "^2.6.2",
+    "svgdom": "0.0.15",
     "webpack": "^3.5.6",
     "webpack-dev-server": "^2.8.1"
   },

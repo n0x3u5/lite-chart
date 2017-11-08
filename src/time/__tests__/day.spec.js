@@ -1,4 +1,3 @@
-// import { timeDays as days, timeDay as day } from 'd3';
 import day, { days } from '../day';
 import year from '../year';
 import * as date from './date';

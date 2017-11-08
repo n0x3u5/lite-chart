@@ -7,9 +7,9 @@ const hour = new TimeInterval(
 
           if (offset < 0) offset += durationHour;
 
-          d.setTime((Math.floor(((Number(d) - offset) / durationHour) * durationHour) + offset));
+          d.setTime(((Math.floor((Number(d) - offset) / durationHour) * durationHour) + offset));
         },
-        (d, s) => d.setTime((Number(d) + s) * durationHour),
+        (d, s) => d.setTime(Number(d) + (s * durationHour)),
         (s, e) => (e - s) / durationHour,
         d => d.getHours()
       ),

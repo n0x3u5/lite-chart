@@ -8,11 +8,11 @@ class Yearinterval extends TimeInterval {
       return null;
     }
 
-    return this.floor((d) => {
+    return new TimeInterval((d) => {
       d.setFullYear(Math.floor(d.getFullYear() / stepi) * stepi);
       d.setMonth(0, 1);
       d.setHours(0, 0, 0, 0);
-    }, (d, s) => d.setFullYear((d.getFullYear() + s) * stepi));
+    }, (d, s) => d.setFullYear(d.getFullYear() + (s * stepi)));
   }
 }
 

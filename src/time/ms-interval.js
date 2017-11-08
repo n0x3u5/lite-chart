@@ -13,9 +13,9 @@ class MillisecondInterval extends TimeInterval {
       return this;
     }
 
-    return this.floor(
+    return new TimeInterval(
       d => d.setTime(Math.floor(d / stepi) * stepi),
-      (d, s) => d.setTime((Number(d) + s) * stepi),
+      (d, s) => d.setTime(Number(d) + (s * stepi)),
       (s, e) => (e - s) / stepi
     );
   }

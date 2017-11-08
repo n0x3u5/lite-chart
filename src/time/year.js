@@ -9,7 +9,7 @@ const year = new YearInterval(
         (s, e) => e.getFullYear() - s.getFullYear(),
         d => d.getFullYear()
       ),
-      years = year.range;
+      years = year.getRange;
 
 export default year;
 export { years };

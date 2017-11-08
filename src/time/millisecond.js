@@ -5,7 +5,7 @@ const millisecond = new MillisecondInterval(
         (d, s) => d.setTime(Number(d), Number(s)),
         (s, e) => e - s
       ),
-      milliseconds = millisecond.range;
+      milliseconds = millisecond.getRange;
 
 export default millisecond;
 export { milliseconds };

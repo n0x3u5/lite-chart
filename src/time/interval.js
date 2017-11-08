@@ -21,7 +21,9 @@ class TimeInterval {
   ceil (date) {
     const datei = new Date(date - 1);
 
-    this.floori(datei, this.offseti(datei, 1), this.floori(datei));
+    this.floori(datei);
+    this.offseti(datei, 1);
+    this.floori(datei);
 
     return datei;
   }

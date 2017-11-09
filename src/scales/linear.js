@@ -58,7 +58,7 @@ class ScaleLinear extends ScaleContinuous {
   }
 
   copy () {
-    return copyScale(this, new ScaleLinear(deinterpolate, reinterpolate));
+    return copyScale(this, new ScaleLinear(this.deinterpolate, this.reinterpolate));
   }
 }
 
